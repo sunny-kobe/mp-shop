@@ -25,6 +25,14 @@ const subCategoryList = computed(() => {
   return categoryList.value[activeIndex.value]?.children || []
 })
 
+const scrollTop = ref(0)
+const scroll = (e: any) => {
+  scrollTop.value = e.scrollTop
+}
+const toogle = (index: number) => {
+  activeIndex.value = index
+  scrollTop.value = 0
+}
 // 是否数据加载完毕
 const isFinish = ref(false)
 onLoad(async () => {
@@ -50,13 +58,13 @@ onLoad(async () => {
           :key="item.id"
           class="item"
           :class="{ active: index === activeIndex }"
-          @tap="activeIndex = index"
+          @tap="toogle(index)"
         >
           <text class="name"> {{ item.name }} </text>
         </view>
       </scroll-view>
       <!-- 右侧：二级分类 -->
-      <scroll-view class="secondary" scroll-y>
+      <scroll-view class="secondary" scroll-y :scroll-top="scrollTop" @scroll="scroll">
         <!-- 焦点图 -->
         <XtxSwiper class="banner" :list="bannerList" />
         <!-- 内容区域 -->
