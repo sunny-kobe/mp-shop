@@ -1,5 +1,6 @@
 import type { PageParams, PageResult } from '@/types/global'
-import type { BannerItem, CategoryItem, GuessItem, HotItem } from '@/types/home'
+import type { HotResult } from '@/types/hot'
+import type { BannerItem, CategoryItem, GuessItem, HotItem, HotParams } from '@/types/home'
 import { http } from '@/utils/http'
 
 /**
@@ -33,6 +34,14 @@ export const getHomeHotAPI = () => {
   return http<HotItem[]>({
     method: 'GET',
     url: '/home/hot/mutli',
+  })
+}
+
+export const getHotRecommendAPI = (url: string, data: HotParams) => {
+  return http<HotResult>({
+    method: 'GET',
+    url,
+    data,
   })
 }
 

@@ -38,5 +38,10 @@ export type HotItem = {
   type: string
 }
 
+export type HotParams = PageParams & {
+  /** Tab 项的 id，默认查询全部 Tab 项的第 1 页数据 */
+  subType?: string
+}
+
 /** 猜你喜欢-商品类型 */
 export type GuessItem = GoodsItem
