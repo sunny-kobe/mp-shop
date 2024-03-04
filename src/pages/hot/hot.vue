@@ -36,7 +36,6 @@ onLoad(() => {
 const onScrolltolower = async () => {
   // 获取当前选项
   const currsubTypes = subTypes.value[activeIndex.value]
-  console.log(currsubTypes)
   // 分页条件
   if (currsubTypes.goodsItems.page < currsubTypes.goodsItems.pages) {
     // 当前页码累加
