@@ -1,5 +1,5 @@
 <template>
-  <div class="pagesMember">pagesMember</div>
+  <div class="profile">profile</div>
 </template>
 
 <script lang="ts" setup></script>
