@@ -1,11 +1,61 @@
 <script setup lang="ts">
-//
+import type { InputNumberBoxEvent } from '@/components/vk-data-input-number-box/vk-data-input-number-box'
+import {
+  deleteMemberCartAPI,
+  getMemberCartAPI,
+  putMemberCartBySkuIdAPI,
+  putMemberCartSelectedAPI,
+} from '@/services/cart'
+import { useMemberStore } from '@/stores'
+import type { CartItem } from '@/types/cart'
+import { onShow } from '@dcloudio/uni-app'
+import { ref } from 'vue'
+
+// 获取会员Store
+const memberStore = useMemberStore()
+
+// 获取购物车数据
+const cartList = ref<CartItem[]>([])
+const getMemberCartData = async () => {
+  const res = await getMemberCartAPI()
+  cartList.value = res.result
+}
+
+// 点击删除按钮
+const onDeleteCart = (skuId: string) => {
+  // 弹窗二次确认
+  uni.showModal({
+    content: '是否删除',
+    confirmColor: '#27BA9B',
+    success: async (res) => {
+      if (res.confirm) {
+        // 后端删除单品
+        await deleteMemberCartAPI({ ids: [skuId] })
+        // 重新获取列表
+        getMemberCartData()
+      }
+    },
+  })
+}
+
+// 修改商品数量
+const onChangeCount = (ev: InputNumberBoxEvent) => {
+  putMemberCartBySkuIdAPI(ev.index, { count: ev.value })
+}
+
+// 初始化调用: 页面显示触发
+onShow(() => {
+  // 用户已登录才允许调用
+  if (memberStore.profile) {
+    getMemberCartData()
+  }
+})
 </script>
 
 <template>
   <scroll-view scroll-y class="scroll-view">
     <!-- 已登录: 显示购物车 -->
-    <template v-if="true">
+    <template v-if="memberStore.profile">
       <!-- 购物车列表 -->
       <view class="cart-list" v-if="true">
         <!-- 优惠提示 -->
@@ -16,38 +66,38 @@
         <!-- 滑动操作分区 -->
         <uni-swipe-action>
           <!-- 滑动操作项 -->
-          <uni-swipe-action-item v-for="item in 2" :key="item" class="cart-swipe">
+          <uni-swipe-action-item v-for="item in cartList" :key="item.skuId" class="cart-swipe">
             <!-- 商品信息 -->
             <view class="goods">
               <!-- 选中状态 -->
               <text class="checkbox" :class="{ checked: true }"></text>
               <navigator
-                :url="`/pages/goods/goods?id=1435025`"
+                :url="`/pages/goods/goods?id=${item.id}`"
                 hover-class="none"
                 class="navigator"
               >
-                <image
-                  mode="aspectFill"
-                  class="picture"
-                  src="https://yanxuan-item.nosdn.127.net/da7143e0103304f0f3230715003181ee.jpg"
-                ></image>
+                <image mode="aspectFill" class="picture" :src="item.picture"></image>
                 <view class="meta">
-                  <view class="name ellipsis">人手必备，儿童轻薄透气防蚊裤73-140cm</view>
-                  <view class="attrsText ellipsis">黄色小象 140cm</view>
-                  <view class="price">69.00</view>
+                  <view class="name ellipsis">{{ item.name }}</view>
+                  <view class="attrsText ellipsis">{{ item.attrsText }}</view>
+                  <view class="price">{{ item.nowPrice }}</view>
                 </view>
               </navigator>
               <!-- 商品数量 -->
               <view class="count">
-                <text class="text">-</text>
-                <input class="input" type="number" value="1" />
-                <text class="text">+</text>
+                <vk-data-input-number-box
+                  v-model="item.count"
+                  :min="1"
+                  :max="item.stock"
+                  :index="item.skuId"
+                  @change="onChangeCount"
+                />
               </view>
             </view>
             <!-- 右侧删除按钮 -->
             <template #right>
               <view class="cart-swipe-right">
-                <button class="button delete-button">删除</button>
+                <button @tap="onDeleteCart(item.skuId)" class="button delete-button">删除</button>
               </view>
             </template>
           </uni-swipe-action-item>
