@@ -124,6 +124,29 @@
 					}
 				}
 			]
+		},
+		{
+			"root": "pagesOrder",
+			"pages": [
+				{
+					"path": "create/create",
+					"style": {
+						"navigationBarTitleText": "create"
+					}
+				},
+				{
+					"path": "detail/detail",
+					"style": {
+						"navigationBarTitleText": "detail"
+					}
+				},
+				{
+					"path": "list/list",
+					"style": {
+						"navigationBarTitleText": "list"
+					}
+				}
+			]
 		}
 	],
 	"preloadRule": {
