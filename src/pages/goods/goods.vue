@@ -6,7 +6,7 @@ import type {
 } from '@/components/vk-data-goods-sku-popup/vk-data-goods-sku-popup'
 import { postMemberCartAPI } from '@/services/cart'
 import { getGoodsByIdAPI } from '@/services/goods'
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import AddressPanel from './components/AddressPanel.vue'
 import ServicePanel from './components/ServicePanel.vue'
 import { onLoad } from '@dcloudio/uni-app'
@@ -90,6 +90,13 @@ const openSkuPopup = (val: any) => {
   mode.value = val
 }
 
+// SKU组件实例
+const skuPopupRef = ref<SkuPopupInstance>()
+// 计算被选中的值
+const selectArrText = computed(() => {
+  return skuPopupRef.value?.selectArr?.join(' ').trim() || '请选择商品规格'
+})
+
 // 加入购物车事件
 const onAddCart = async (ev: SkuPopupEvent) => {
   await postMemberCartAPI({ skuId: ev._id, count: ev.buy_num })
@@ -154,7 +161,7 @@ onLoad(() => {
       <view class="action">
         <view @tap="openSkuPopup(SkuMode.Both)" class="item arrow">
           <text class="label">选择</text>
-          <text class="text ellipsis"> 请选择商品规格 </text>
+          <text class="text ellipsis"> {{ selectArrText }} </text>
         </view>
         <view @tap="openPopup('address')" class="item arrow">
           <text class="label">送至</text>
@@ -227,7 +234,7 @@ onLoad(() => {
       <button class="icons-button" open-type="contact">
         <text class="icon-handset"></text>客服
       </button>
-      <navigator class="icons-button" url="/pages/cart/cart" open-type="switchTab">
+      <navigator class="icons-button" url="/pages/cart/cart2" open-type="navigate">
         <text class="icon-cart"></text>购物车
       </navigator>
     </view>
