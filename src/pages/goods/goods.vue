@@ -193,12 +193,11 @@ onLoad(() => {
         </view>
         <!-- 图片详情 -->
         <image
+          class="image"
+          v-for="item in goods?.details.pictures"
+          :key="item"
           mode="widthFix"
-          src="https://yanxuan-item.nosdn.127.net/a8d266886d31f6eb0d7333c815769305.jpg"
-        ></image>
-        <image
-          mode="widthFix"
-          src="https://yanxuan-item.nosdn.127.net/a9bee1cb53d72e6cdcda210071cbd46a.jpg"
+          :src="item"
         ></image>
       </view>
     </view>
