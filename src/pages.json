@@ -22,6 +22,8 @@
     {
       "path": "pages/my/my",
       "style": {
+        "navigationStyle": "custom",
+        "navigationBarTextStyle": "white",
         "navigationBarTitleText": "我的"
       }
     },
@@ -52,7 +54,7 @@
     {
       "path": "pages/hot/hot",
       "style": {
-        "navigationBarTitleText": "hot"
+        "navigationBarTitleText": "热门推荐"
       }
     },
     {
@@ -114,19 +116,21 @@
         {
           "path": "profile/profile",
           "style": {
+            "navigationStyle": "custom",
+            "navigationBarTextStyle": "white",
             "navigationBarTitleText": "个人信息"
           }
         },
         {
           "path": "address/address",
           "style": {
-            "navigationBarTitleText": "address"
+            "navigationBarTitleText": "地址管理"
           }
         },
         {
           "path": "address-form/address-form",
           "style": {
-            "navigationBarTitleText": "address-form"
+            "navigationBarTitleText": ""
           }
         }
       ]
@@ -137,19 +141,20 @@
         {
           "path": "create/create",
           "style": {
-            "navigationBarTitleText": "create"
+            "navigationBarTitleText": "填写订单"
           }
         },
         {
           "path": "detail/detail",
           "style": {
-            "navigationBarTitleText": "detail"
+            "navigationBarTitleText": "订单详情",
+            "navigationStyle": "custom"
           }
         },
         {
           "path": "list/list",
           "style": {
-            "navigationBarTitleText": "list"
+            "navigationBarTitleText": "订单列表"
           }
         }
       ]
