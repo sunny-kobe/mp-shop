@@ -1,11 +1,29 @@
 <script setup lang="ts">
 import { useGuessList } from '@/composables'
+import { OrderState, orderStateList } from '@/services/constants'
+import {
+  deleteMemberOrderAPI,
+  getMemberOrderByIdAPI,
+  getMemberOrderCancelByIdAPI,
+  getMemberOrderLogisticsByIdAPI,
+  getMemberOrderConsignmentByIdAPI,
+  putMemberOrderReceiptByIdAPI,
+} from '@/services/order'
+import type { LogisticItem, OrderResult } from '@/types/order'
+import { onLoad, onReady } from '@dcloudio/uni-app'
 import { ref } from 'vue'
-
+// import PageSkeleton from './components/PageSkeleton.vue'
+// import { getPayMockAPI, getPayWxPayMiniPayAPI } from '@/services/pay'
 // 获取屏幕边界到安全区域距离
 const { safeAreaInsets } = uni.getSystemInfoSync()
 // 猜你喜欢
 const { guessRef, onScrolltolower } = useGuessList()
+
+// 获取页面栈
+const pages = getCurrentPages()
+// 获取当前页面实例，数组最后一项
+const pageInstance = pages.at(-1) as any
+
 // 弹出层组件
 const popup = ref<UniHelper.UniPopupInstance>()
 // 取消原因列表
@@ -28,36 +46,101 @@ const onCopy = (id: string) => {
 const query = defineProps<{
   id: string
 }>()
+
+// 页面渲染完毕，绑定动画效果
+onReady(() => {
+  // 动画效果,导航栏背景色
+  pageInstance.animate(
+    '.navbar', // 选择器
+    [{ backgroundColor: 'transparent' }, { backgroundColor: '#f8f8f8' }], // 关键帧信息
+    1000, // 动画持续时长
+    {
+      scrollSource: '#scroller', // scroll-view 的选择器
+      startScrollOffset: 0, // 开始滚动偏移量
+      endScrollOffset: 50, // 停止滚动偏移量
+      timeRange: 1000, // 时间长度
+    },
+  )
+  // 动画效果,导航栏标题
+  pageInstance.animate('.navbar .title', [{ color: 'transparent' }, { color: '#000' }], 1000, {
+    scrollSource: '#scroller',
+    timeRange: 1000,
+    startScrollOffset: 0,
+    endScrollOffset: 50,
+  })
+  // 动画效果,导航栏返回按钮
+  pageInstance.animate('.navbar .back', [{ color: '#fff' }, { color: '#000' }], 1000, {
+    scrollSource: '#scroller',
+    timeRange: 1000,
+    startScrollOffset: 0,
+    endScrollOffset: 50,
+  })
+})
+
+// 获取订单详情
+const order = ref<OrderResult>()
+const getMemberOrderByIdData = async () => {
+  const res = await getMemberOrderByIdAPI(query.id)
+  order.value = res.result
+}
+
+onLoad(() => {
+  getMemberOrderByIdData()
+})
+
+// 倒计时结束事件
+const onTimeup = () => {
+  // 修改订单状态为已取消
+  order.value!.orderState = OrderState.YiQuXiao
+}
 </script>
 
 <template>
   <!-- 自定义导航栏: 默认透明不可见, scroll-view 滚动到 50 时展示 -->
   <view class="navbar" :style="{ paddingTop: safeAreaInsets?.top + 'px' }">
     <view class="wrap">
-      <navigator v-if="true" open-type="navigateBack" class="back icon-left"></navigator>
+      <navigator
+        v-if="pages.length > 1"
+        open-type="navigateBack"
+        class="back icon-left"
+      ></navigator>
       <navigator v-else url="/pages/index/index" open-type="switchTab" class="back icon-home">
       </navigator>
       <view class="title">订单详情</view>
     </view>
   </view>
-  <scroll-view scroll-y class="viewport" id="scroller" @scrolltolower="onScrolltolower">
-    <template v-if="true">
+  <scroll-view
+    scroll-y
+    class="viewport"
+    id="scroller"
+    enable-back-to-top
+    @scrolltolower="onScrolltolower"
+  >
+    <template v-if="order">
       <!-- 订单状态 -->
       <view class="overview" :style="{ paddingTop: safeAreaInsets!.top + 20 + 'px' }">
         <!-- 待付款状态:展示去支付按钮和倒计时 -->
-        <template v-if="true">
+        <template v-if="order.orderState === OrderState.DaiFuKuan">
           <view class="status icon-clock">等待付款</view>
           <view class="tips">
-            <text class="money">应付金额: ¥ 99.00</text>
+            <text class="money">应付金额: ¥ 199.00</text>
             <text class="time">支付剩余</text>
-            00 时 29 分 59 秒
+            <!-- 倒计时组件 -->
+            <uni-countdown
+              :second="order.countdown"
+              color="#fff"
+              splitor-color="#fff"
+              :show-day="false"
+              :show-colon="false"
+              @timeup="onTimeup"
+            />
           </view>
           <view class="button">去支付</view>
         </template>
         <!-- 其他订单状态:展示再次购买按钮 -->
         <template v-else>
           <!-- 订单状态文字 -->
-          <view class="status"> 待付款 </view>
+          <view class="status"> {{ orderStateList[order.orderState].text }} </view>
           <view class="button-group">
             <navigator
               class="button"
