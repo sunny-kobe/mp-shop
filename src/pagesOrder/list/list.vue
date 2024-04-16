@@ -43,9 +43,9 @@ console.log('query', query)
       <view class="cursor" :style="{ left: activeIndex * 20 + '%' }"></view>
     </view>
     <!-- 滑动容器 -->
-    <swiper class="swiper">
+    <swiper :current="activeIndex" @change="activeIndex = $event.detail.current" class="swiper">
       <!-- 滑动项 -->
-      <swiper-item v-for="item in 5" :key="item">
+      <swiper-item v-for="item in orderTabs" :key="item.title">
         <!-- 订单列表 -->
         <scroll-view scroll-y class="orders">
           <view class="card" v-for="item in 2" :key="item">
