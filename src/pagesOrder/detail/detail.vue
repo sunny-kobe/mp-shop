@@ -80,6 +80,7 @@ onReady(() => {
 // 获取订单详情
 const order = ref<OrderResult>()
 const getMemberOrderByIdData = async () => {
+  console.log(query.id)
   const res = await getMemberOrderByIdAPI(query.id)
   order.value = res.result
 }
@@ -103,9 +104,16 @@ const onOrderPay = async () => {
     // 开发环境：模拟支付，修改订单状态为已支付
     await getPayMockAPI({ orderId: query.id })
   } else {
+    // #ifdef VUE3
     // 生产环境：获取支付参数 + 发起微信支付
     const res = await getPayWxPayMiniPayAPI({ orderId: query.id })
     await wx.requestPayment(res.result)
+    // #endif
+
+    // #ifdef H5
+    // H5端 和 App 端未开通支付-模拟支付体验
+    await getPayMockAPI({ orderId: query.id })
+    // #endif
   }
   // 关闭当前页，再跳转支付结果页
   uni.redirectTo({ url: `/pagesOrder/payment/payment?id=${query.id}` })
